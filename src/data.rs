@@ -99,7 +99,11 @@ pub fn catchment_xdata(c: f64, flow_length_ft: f64, slope: f64, inlet_handle: Ha
 /// Unifies the two apply_tc paths and eliminates .cloned() on record for replace.
 /// Small N (1-3 records/entity) so tiny Vec clone of records is acceptable; main win
 /// is avoiding full-entity Vec clones in dispatch.
-fn replace_xdata_record(xd: &mut acadrust::xdata::ExtendedData, app_name: &str, new_rec: ExtendedDataRecord) {
+pub(crate) fn replace_xdata_record(
+    xd: &mut acadrust::xdata::ExtendedData,
+    app_name: &str,
+    new_rec: ExtendedDataRecord,
+) {
     // Proper replace by app name using acadrust API (clear + re-add kept + new).
     // Clones only the (tiny) kept XDATA records per entity (N<=1 for our STORMSEWER_* apps).
     // This eliminates the prior filter+clone patterns for record replacement (Issue 9).
@@ -132,6 +136,30 @@ fn handle(v: &XDataValue) -> Option<Handle> {
     }
 }
 
+/// Public structure fields for placement / edit / validation.
+#[derive(Clone, Debug)]
+pub struct StructureInfo {
+    pub handle: Handle,
+    pub kind: NodeKind,
+    pub invert: f64,
+    pub rim: f64,
+    pub area: f64,
+    pub c: f64,
+    pub tc_inlet: f64,
+    pub x: f64,
+    pub y: f64,
+}
+
+#[derive(Clone, Debug)]
+pub struct PipeInfo {
+    pub handle: Handle,
+    pub diameter: f64,
+    pub n: f64,
+    pub from: Handle,
+    pub to: Handle,
+    pub length: f64,
+}
+
 struct StructRec {
     handle: Handle,
     kind: NodeKind,
@@ -142,6 +170,22 @@ struct StructRec {
     tc_inlet: f64,
     x: f64,
     y: f64,
+}
+
+impl From<StructRec> for StructureInfo {
+    fn from(s: StructRec) -> Self {
+        Self {
+            handle: s.handle,
+            kind: s.kind,
+            invert: s.invert,
+            rim: s.rim,
+            area: s.area,
+            c: s.c,
+            tc_inlet: s.tc_inlet,
+            x: s.x,
+            y: s.y,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -244,6 +288,45 @@ pub fn nearest_drainage_structure_at_point<'a>(
     pick_padding_ft: f64,
 ) -> Option<Handle> {
     nearest_structure_at_point(entities, x, y, pick_padding_ft, false)
+}
+
+pub fn read_structure_info(e: &EntityType) -> Option<StructureInfo> {
+    read_structure(e).map(StructureInfo::from)
+}
+
+pub fn read_pipe_info(e: &EntityType) -> Option<PipeInfo> {
+    let p = read_pipe(e)?;
+    Some(PipeInfo {
+        handle: e.common().handle,
+        diameter: p.diameter,
+        n: p.n,
+        from: p.from,
+        to: p.to,
+        length: p.length,
+    })
+}
+
+pub fn write_structure_info(e: &mut EntityType, info: &StructureInfo) {
+    let EntityType::Circle(c) = e else {
+        return;
+    };
+    c.center.x = info.x;
+    c.center.y = info.y;
+    let (area, c_val) = if info.kind == NodeKind::Outfall {
+        (0.0, 0.0)
+    } else {
+        (info.area, info.c)
+    };
+    let xd = &mut e.common_mut().extended_data;
+    replace_xdata_record(
+        xd,
+        APP_STRUCT,
+        structure_xdata_tc(info.kind, info.invert, info.rim, area, c_val, info.tc_inlet),
+    );
+}
+
+pub(crate) fn replace_pipe_xdata(xd: &mut acadrust::xdata::ExtendedData, record: ExtendedDataRecord) {
+    replace_xdata_record(xd, APP_PIPE, record);
 }
 
 fn read_structure(e: &EntityType) -> Option<StructRec> {

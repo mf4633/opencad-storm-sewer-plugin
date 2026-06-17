@@ -6,13 +6,16 @@
 mod analysis;
 mod data;
 mod dispatch;
+mod edit;
 #[cfg(test)]
 mod integration_tests;
 mod landxml_import;
 mod params_cmd;
+mod placement;
 mod sizing;
 mod state;
 mod style;
+mod validation;
 
 use ocs_plugin_api::host::{BuiltinPlugin, HostApi};
 use ocs_plugin_api::manifest::PluginManifest;
@@ -26,7 +29,7 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.1.0",
+        version: "0.2.0",
         description: "Gravity storm-drain network design and analysis",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,
@@ -77,6 +80,7 @@ impl CadModule for StormSewerModule {
                         },
                     }),
                     RibbonItem::Tool(tool("SS_APPLYTC", "Apply Tc", "⏱")),
+                    RibbonItem::Tool(tool("SS_EDIT", "Edit", "✎")),
                 ],
             },
             RibbonGroup {
@@ -84,6 +88,7 @@ impl CadModule for StormSewerModule {
                 tools: vec![
                     RibbonItem::LargeTool(tool("SS_ANALYZE", "Analyze", "⚡")),
                     RibbonItem::LargeTool(tool("SS_SIZE", "Size\nPipes", "⌀")),
+                    RibbonItem::Tool(tool("SS_VALIDATE", "Validate", "✓")),
                     RibbonItem::Tool(tool("SS_PARAMS", "Params", "⚙")),
                     RibbonItem::Tool(tool("SS_MULTIRP", "Multi-RP", "≋")),
                     RibbonItem::Tool(tool("SS_REPORT", "Report", "📋")),

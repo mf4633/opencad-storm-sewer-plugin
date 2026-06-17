@@ -2,60 +2,61 @@
 
 External add-on for gravity storm-drain network design and analysis in [Open CAD Studio](https://github.com/HakanSeven12/OpenCADStudio).
 
-- **Engine:** `crates/stormsewer` (headless hydraulics)
-- **Host contract:** `ocs_plugin_api` (`HostApi`, `BuiltinPlugin`, `export_plugin!`)
-
 ## Commands
 
-| Command | v0.1.0 | Description |
-|---------|--------|-------------|
-| `SS_ANALYZE` | yes | Run hydraulic analysis on drawn network |
-| `SS_REPORT` | yes | Print analysis report |
-| `SS_PROFILE` | yes | Draw HGL profile |
-| `SS_SIZE` | yes | Size pipes from analysis |
-| `SS_PARAMS` | yes | Set rainfall / analysis parameters |
-| `SS_MULTIRP` | yes | Multi return-period analysis |
-| `SS_APPLYTC` | yes | Apply time-of-concentration from catchments |
-| `SS_IMPORTXML <path>` | yes | Import LandXML storm network |
-| `SS_INLET` / `SS_JUNCTION` / `SS_OUTFALL` / `SS_PIPE` / `SS_CATCHMENT` | pending | Interactive placement (needs `HostApi` hook) |
+| Command | Since | Description |
+|---------|-------|-------------|
+| `SS_INLET <x>,<y> [invert] [rim] [area] [C]` | 0.2 | Place inlet structure |
+| `SS_JUNCTION <x>,<y> [...]` | 0.2 | Place junction |
+| `SS_OUTFALL <x>,<y> [invert] [rim]` | 0.2 | Place outfall |
+| `SS_PIPE <from> <to> [dia] [n]` | 0.2 | Pipe by structure handles |
+| `SS_PIPE <x1>,<y1> <x2>,<y2> [dia] [n]` | 0.2 | Pipe snapping to nearest structures |
+| `SS_EDIT <handle> <field> <value> [...]` | 0.2 | Edit structure or pipe XDATA |
+| `SS_VALIDATE` | 0.2 | Check drawing for common issues |
+| `SS_ANALYZE` | 0.1 | Run analysis (+ surcharge/flood styling) |
+| `SS_REPORT` / `SS_PROFILE` / `SS_SIZE` | 0.1 | Report, profile, sizing |
+| `SS_PARAMS` / `SS_MULTIRP` / `SS_APPLYTC` | 0.1 | Parameters, multi-RP, Tc apply |
+| `SS_IMPORTXML <path>` | 0.1 | LandXML import (ribbon file dialog too) |
+| `SS_CATCHMENT` | — | Interactive catchment (pending HostApi hook) |
 
-LandXML import also available via the **Import LandXML** ribbon tool (native file dialog).
+### Example workflow (v0.2, no interactive pick)
+
+```
+SS_INLET 0,0 104 110 1.0 0.7
+SS_OUTFALL 200,0 100 106
+SS_PIPE 1 2 1.5 0.013
+SS_VALIDATE
+SS_ANALYZE
+SS_EDIT 1 invert 103.5
+```
 
 ## XDATA schemas
 
-Domain data lives on DWG entities so networks round-trip through save/load.
-
 ### `STORMSEWER_STRUCT` (on `CIRCLE`)
 
-| Index | Field | Type | Notes |
-|-------|-------|------|-------|
-| 0 | kind | string | `inlet`, `junction`, `outfall` |
-| 1 | invert | real | Structure invert elevation |
-| 2 | rim | real | Rim elevation |
-| 3 | area | real | Contributing area (acres) |
-| 4 | C | real | Runoff coefficient |
-| 5 | tc | real | Time of concentration (minutes) |
+| Index | Field | Type |
+|-------|-------|------|
+| 0 | kind | string (`inlet` / `junction` / `outfall`) |
+| 1 | invert | real |
+| 2 | rim | real |
+| 3 | area | real (acres) |
+| 4 | C | real |
+| 5 | tc | real (minutes) |
 
 ### `STORMSEWER_PIPE` (on `LINE`)
 
-| Index | Field | Type | Notes |
-|-------|-------|------|-------|
-| 0 | diameter | real | Pipe diameter (inches) |
-| 1 | n | real | Manning's n |
-| 2 | from_handle | handle | Start structure |
-| 3 | to_handle | handle | End structure |
+| Index | Field | Type |
+|-------|-------|------|
+| 0 | diameter | real (inches) |
+| 1 | n | real |
+| 2 | from_handle | handle |
+| 3 | to_handle | handle |
 
-### `STORMSEWER_CATCHMENT` (on `LWPOLYLINE`)
+### `STORMSEWER_CATCHMENT` (on closed `LWPOLYLINE`)
 
-| Index | Field | Type | Notes |
-|-------|-------|------|-------|
-| 0 | C | real | Runoff coefficient |
-| 1 | length_ft | real | Flow path length |
-| 2 | slope | real | Average slope |
-| 3 | inlet_handle | handle | Inlet structure (optional) |
-
-## Per-document state
-
-Keyed under plugin id `opencad.storm_sewer` as `StormTabState`:
-
-- `StormAnalysisParams` — IDF, tailwater, min Tc, return periods, etc.
+| Index | Field | Type |
+|-------|-------|------|
+| 0 | C | real |
+| 1 | length_ft | real |
+| 2 | slope | real |
+| 3 | inlet_handle | handle (0 = auto) |

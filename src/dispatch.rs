@@ -8,11 +8,14 @@ use acadrust::Handle;
 use stormsewer::network::NodeKind;
 
 use super::analysis;
+use super::edit;
 use super::landxml_import;
 use super::manifest::PLUGIN_ID;
 use super::params_cmd;
+use super::placement;
 use super::sizing;
 use super::state::StormTabState;
+use super::validation;
 use super::{data, style};
 
 fn tab_params(host: &mut dyn HostApi) -> stormsewer::params::StormAnalysisParams {
@@ -36,6 +39,15 @@ fn command_arg(cmd: &str) -> Option<&str> {
     parts.next().map(str::trim).filter(|s| !s.is_empty())
 }
 
+fn run_validation(host: &mut dyn HostApi, block_on_error: bool) -> bool {
+    let report = validation::validate_entities(entities(host));
+    report.emit_to_host(host);
+    if block_on_error && !report.ok() {
+        return false;
+    }
+    true
+}
+
 /// Handle any `SS_*` command. Returns true when consumed.
 pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
     if !cmd.starts_with("SS_") {
@@ -43,7 +55,18 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
     }
 
     match cmd {
+        "SS_VALIDATE" => {
+            let _ = run_validation(host, false);
+            true
+        }
         "SS_ANALYZE" => {
+            if !run_validation(host, false) {
+                // warnings only — still attempt analyze unless hard errors
+            }
+            let report = validation::validate_entities(entities(host));
+            if !report.ok() {
+                return true;
+            }
             let params = tab_params(host);
             match analysis::analyze_doc(entities(host), &params) {
                 Ok((ents, report, analysis)) => {
@@ -188,11 +211,69 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             }
             true
         }
-        "SS_INLET" | "SS_JUNCTION" | "SS_OUTFALL" | "SS_PIPE" | "SS_CATCHMENT" => {
+        "SS_INLET" => {
+            host.push_info(placement::usage_inlet());
+            true
+        }
+        cmd if cmd.starts_with("SS_INLET ") => {
+            match placement::place_structure(host, NodeKind::Inlet, command_arg(cmd).unwrap_or("")) {
+                Ok(msg) => host.push_info(&msg),
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
+        "SS_JUNCTION" => {
+            host.push_info(placement::usage_junction());
+            true
+        }
+        cmd if cmd.starts_with("SS_JUNCTION ") => {
+            match placement::place_structure(host, NodeKind::Junction, command_arg(cmd).unwrap_or("")) {
+                Ok(msg) => host.push_info(&msg),
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
+        "SS_OUTFALL" => {
+            host.push_info(placement::usage_outfall());
+            true
+        }
+        cmd if cmd.starts_with("SS_OUTFALL ") => {
+            match placement::place_structure(host, NodeKind::Outfall, command_arg(cmd).unwrap_or("")) {
+                Ok(msg) => host.push_info(&msg),
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
+        "SS_PIPE" => {
+            host.push_info(&format!(
+                "{}  OR  {}",
+                placement::usage_pipe_handles(),
+                placement::usage_pipe_coords()
+            ));
+            true
+        }
+        cmd if cmd.starts_with("SS_PIPE ") => {
+            match placement::place_pipe(host, command_arg(cmd).unwrap_or("")) {
+                Ok(msg) => host.push_info(&msg),
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
+        "SS_EDIT" => {
+            host.push_info(edit::usage());
+            true
+        }
+        cmd if cmd.starts_with("SS_EDIT ") => {
+            match edit::edit_entity(host, command_arg(cmd).unwrap_or("")) {
+                Ok(msg) => host.push_info(&msg),
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
+        "SS_CATCHMENT" => {
             host.push_info(
-                "Interactive placement commands require a HostApi interactive-command hook \
-                 (OpenCADStudio#100). Use LandXML import or draw structures with XDATA manually \
-                 until placement lands.",
+                "SS_CATCHMENT requires interactive polyline pick (pending HostApi hook). \
+                 Tag catchments manually with STORMSEWER_CATCHMENT XDATA or use LandXML import.",
             );
             true
         }
