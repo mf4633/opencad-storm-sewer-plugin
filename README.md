@@ -4,14 +4,17 @@ Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeve
 
 Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (the host's stable contract crate) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.1.0 scaffold)
+## Status (v0.1.0)
 
 | Area | Status |
 |------|--------|
 | Engine (`stormsewer`) | Ported — Rational, Manning, HGL, LandXML, `.ssn` |
 | Analysis commands | `SS_ANALYZE`, `SS_REPORT`, `SS_PROFILE`, `SS_SIZE`, `SS_PARAMS`, `SS_MULTIRP` |
+| Import / utilities | `SS_IMPORTXML`, `SS_APPLYTC` (ribbon + command-line path) |
 | Interactive placement | Pending `HostApi` interactive-command hook ([#100](https://github.com/HakanSeven12/OpenCADStudio/issues/100#issuecomment-4733946258)) |
-| Registry listing | Planned after first release |
+| Registry listing | PR open / pending merge |
+
+See [PLUGIN.md](PLUGIN.md) for XDATA schemas and command reference.
 
 ## Install (from Open CAD Studio)
 

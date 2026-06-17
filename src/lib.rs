@@ -6,6 +6,9 @@
 mod analysis;
 mod data;
 mod dispatch;
+#[cfg(test)]
+mod integration_tests;
+mod landxml_import;
 mod params_cmd;
 mod sizing;
 mod state;
@@ -62,6 +65,18 @@ impl CadModule for StormSewerModule {
                     RibbonItem::LargeTool(tool("SS_JUNCTION", "Junction", "◎")),
                     RibbonItem::LargeTool(tool("SS_OUTFALL", "Outfall", "▽")),
                     RibbonItem::LargeTool(tool("SS_PIPE", "Pipe\nRun", "╱")),
+                    RibbonItem::Tool(ToolDef {
+                        id: "SS_IMPORTXML",
+                        label: "Import\nLandXML",
+                        icon: IconKind::Glyph("⬇"),
+                        event: ModuleEvent::PluginFileDialog {
+                            command: "SS_IMPORTXML".to_string(),
+                            title: "Import LandXML pipe network".to_string(),
+                            filter_name: "LandXML".to_string(),
+                            extensions: vec!["xml".to_string(), "landxml".to_string()],
+                        },
+                    }),
+                    RibbonItem::Tool(tool("SS_APPLYTC", "Apply Tc", "⏱")),
                 ],
             },
             RibbonGroup {
