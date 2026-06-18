@@ -8,7 +8,7 @@
 use acadrust::types::Vector3;
 use acadrust::{Circle, EntityType, Line, MText};
 
-use stormsewer::design::check_inlet;
+use stormsewer::design::{check_inlet, design_review, DesignFinding, ReviewCriteria};
 use stormsewer::drawing::{draw_network, DrawConfig};
 use stormsewer::idf::IdfCurve;
 use stormsewer::network::{Analysis, AnalysisOptions, Network, Node, NodeKind, Pipe};
@@ -65,6 +65,17 @@ pub fn report_doc<'a>(
     let net = data::network_from_entities(entities)?;
     let a = run_analysis(&net, params.idf.design_curve(), &params.hydraulics)?;
     Ok(full_report(&net, &a, params))
+}
+
+/// Reconstruct from drawn entities, analyze, and run the design-criteria review
+/// (velocity / cover / slope / capacity / size-progression / surface flooding).
+pub fn design_review_doc<'a>(
+    entities: impl Iterator<Item = &'a EntityType>,
+    params: &StormAnalysisParams,
+) -> Result<Vec<DesignFinding>, String> {
+    let net = data::network_from_entities(entities)?;
+    let a = run_analysis(&net, params.idf.design_curve(), &params.hydraulics)?;
+    Ok(design_review(&net, &a, &ReviewCriteria::default()))
 }
 
 /// Multi-return-period peak-flow comparison table.

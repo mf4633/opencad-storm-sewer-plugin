@@ -57,7 +57,21 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
 
     match cmd {
         "SS_VALIDATE" => {
-            let _ = run_validation(host, false);
+            // Integrity checks (XDATA well-formed, handles resolve) ...
+            let mut report = validation::validate_entities(entities(host));
+            // ... then design-criteria review on the analyzed network. Best-effort:
+            // if the network can't be built/analyzed, the integrity report above
+            // already explains why, so we just skip the design pass.
+            let params = tab_params(host);
+            if let Ok(findings) = analysis::design_review_doc(entities(host), &params) {
+                for f in findings {
+                    match f.severity {
+                        stormsewer::design::Severity::Error => report.errors.push(f.message),
+                        stormsewer::design::Severity::Warning => report.warnings.push(f.message),
+                    }
+                }
+            }
+            report.emit_to_host(host);
             true
         }
         "SS_ANALYZE" => {

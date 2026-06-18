@@ -4,7 +4,7 @@ Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeve
 
 Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v2**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.2.1)
+## Status (v0.2.2)
 
 | Area | Status |
 |------|--------|
@@ -12,7 +12,7 @@ Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio
 | Analysis | `SS_ANALYZE` (+ surcharge/flood colors), report, profile, sizing, multi-RP |
 | Interactive placement | `SS_INLET` / `SS_JUNCTION` / `SS_OUTFALL` (click) + `SS_PIPE` (two structure picks) via `InteractiveCommand` |
 | Automation placement | `SS_INLET 100,200 …`, `SS_PIPE 1 2`, coordinate/handle forms for `--serve` |
-| Edit / validate | `SS_EDIT`, `SS_VALIDATE` |
+| Edit / validate | `SS_EDIT`; `SS_VALIDATE` integrity + design-criteria review (velocity, cover, slope, capacity, size progression, flooding) |
 | Import | LandXML via ribbon file dialog or `SS_IMPORTXML <path>` |
 | Catchment tagging | Manual XDATA or LandXML — interactive polyline pick pending richer `HostApi` |
 
