@@ -12,6 +12,7 @@ use super::edit;
 use super::landxml_import;
 use super::manifest::PLUGIN_ID;
 use super::params_cmd;
+use super::interactive::{PlacePipeInteractive, PlaceStructureInteractive};
 use super::placement;
 use super::sizing;
 use super::state::StormTabState;
@@ -212,7 +213,7 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         "SS_INLET" => {
-            host.push_info(placement::usage_inlet());
+            host.start_interactive(Box::new(PlaceStructureInteractive::inlet()));
             true
         }
         cmd if cmd.starts_with("SS_INLET ") => {
@@ -223,7 +224,7 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         "SS_JUNCTION" => {
-            host.push_info(placement::usage_junction());
+            host.start_interactive(Box::new(PlaceStructureInteractive::junction()));
             true
         }
         cmd if cmd.starts_with("SS_JUNCTION ") => {
@@ -234,7 +235,7 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         "SS_OUTFALL" => {
-            host.push_info(placement::usage_outfall());
+            host.start_interactive(Box::new(PlaceStructureInteractive::outfall()));
             true
         }
         cmd if cmd.starts_with("SS_OUTFALL ") => {
@@ -245,11 +246,7 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         "SS_PIPE" => {
-            host.push_info(&format!(
-                "{}  OR  {}",
-                placement::usage_pipe_handles(),
-                placement::usage_pipe_coords()
-            ));
+            host.start_interactive(Box::new(PlacePipeInteractive::new()));
             true
         }
         cmd if cmd.starts_with("SS_PIPE ") => {
@@ -272,8 +269,8 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
         }
         "SS_CATCHMENT" => {
             host.push_info(
-                "SS_CATCHMENT requires interactive polyline pick (pending HostApi hook). \
-                 Tag catchments manually with STORMSEWER_CATCHMENT XDATA or use LandXML import.",
+                "SS_CATCHMENT interactive polyline tagging is not in v0.2 yet. \
+                 Tag catchments with STORMSEWER_CATCHMENT XDATA on closed polylines, or import via LandXML.",
             );
             true
         }

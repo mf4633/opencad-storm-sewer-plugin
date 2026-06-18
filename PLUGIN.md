@@ -17,7 +17,7 @@ External add-on for gravity storm-drain network design and analysis in [Open CAD
 | `SS_REPORT` / `SS_PROFILE` / `SS_SIZE` | 0.1 | Report, profile, sizing |
 | `SS_PARAMS` / `SS_MULTIRP` / `SS_APPLYTC` | 0.1 | Parameters, multi-RP, Tc apply |
 | `SS_IMPORTXML <path>` | 0.1 | LandXML import (ribbon file dialog too) |
-| `SS_CATCHMENT` | — | Interactive catchment (pending HostApi hook) |
+| `SS_CATCHMENT` | — | Manual XDATA / LandXML (interactive polyline pick planned) |
 
 ### Example workflow (v0.2, no interactive pick)
 

@@ -1,13 +1,13 @@
 [plugin]
 id = "opencad.storm_sewer"
 name = "Storm Sewer"
-version = "0.2.0"
+version = "0.2.1"
 description = "Gravity storm-drain network design and analysis"
 author = "Michael Flynn"
 license = "GPL-3.0-only"
 
 [opencad]
-api_version = 1
+api_version = 2
 ribbon_order = 50
 command_prefixes = ["SS_"]
 xdata_apps = ["STORMSEWER_STRUCT", "STORMSEWER_PIPE", "STORMSEWER_CATCHMENT"]

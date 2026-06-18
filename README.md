@@ -2,26 +2,46 @@
 
 Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeven12/OpenCADStudio), distributed as a prebuilt dynamic library via GitHub Releases.
 
-Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (the host's stable contract crate) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
+Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v2**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.2.0)
+## Status (v0.2.1)
 
 | Area | Status |
 |------|--------|
 | Engine (`stormsewer`) | Rational, Manning, HGL, LandXML, `.ssn` |
 | Analysis | `SS_ANALYZE` (+ surcharge/flood colors), report, profile, sizing, multi-RP |
-| Drafting (coordinate) | `SS_INLET`, `SS_JUNCTION`, `SS_OUTFALL`, `SS_PIPE`, `SS_EDIT` |
-| Validation | `SS_VALIDATE` + warnings on `SS_ANALYZE` |
-| Import | LandXML via ribbon or `SS_IMPORTXML <path>` |
-| Interactive pick placement | Pending `HostApi` hook ([#100](https://github.com/HakanSeven12/OpenCADStudio/issues/100#issuecomment-4733946258)) |
+| Interactive placement | `SS_INLET` / `SS_JUNCTION` / `SS_OUTFALL` (click) + `SS_PIPE` (two structure picks) via `InteractiveCommand` |
+| Automation placement | `SS_INLET 100,200 …`, `SS_PIPE 1 2`, coordinate/handle forms for `--serve` |
+| Edit / validate | `SS_EDIT`, `SS_VALIDATE` |
+| Import | LandXML via ribbon file dialog or `SS_IMPORTXML <path>` |
+| Catchment tagging | Manual XDATA or LandXML — interactive polyline pick pending richer `HostApi` |
 
 See [PLUGIN.md](PLUGIN.md) for syntax and XDATA schemas.
 
+## Repo layout
+
+```
+opencad-storm-sewer-plugin/
+├── Cargo.toml              # cdylib plugin crate
+├── plugin.toml             # Plugin Manager metadata (sync with MANIFEST in lib.rs)
+├── crates/stormsewer/      # headless engine (std-only, WASM-capable)
+├── src/
+│   ├── lib.rs              # BuiltinPlugin + ribbon
+│   ├── dispatch.rs         # SS_* command routing
+│   ├── interactive.rs      # InteractiveCommand (viewport + --serve picks)
+│   ├── placement.rs        # coordinate/handle placement for automation
+│   ├── data.rs             # XDATA schemas + network reconstruction
+│   ├── analysis.rs         # engine bridge
+│   └── …
+├── examples/automate_analyze.py
+└── .github/workflows/release.yml
+```
+
 ## Install (from Open CAD Studio)
 
-**Plugin Manager → Add repository →** `mf4633/opencad-storm-sewer-plugin`, pick a compatible release, **Install**, restart OCS.
+**Plugin Manager → Add repository →** `mf4633/opencad-storm-sewer-plugin`, pick a **v0.2.1+** release (API v2), **Install**, restart OCS.
 
-Or install from a built checkout into `%APPDATA%/OpenCADStudio/plugins/opencad.storm_sewer/`.
+Requires Open CAD Studio **v0.6.0+** (interactive-command hook).
 
 ## Build
 
@@ -30,6 +50,10 @@ cargo build --release
 ```
 
 Produces `opencad_storm_sewer_plugin.dll` (Windows) / `libopencad_storm_sewer_plugin.so` (Linux) / `libopencad_storm_sewer_plugin.dylib` (macOS). Ship beside `plugin.toml`.
+
+## Release
+
+Tag `v0.2.1` (or later) — CI attaches per-platform binaries + `plugin.toml` to the GitHub Release for Plugin Manager.
 
 ## XDATA contract
 
@@ -41,10 +65,10 @@ Domain data lives on DWG entities (round-trips through DXF/DWG):
 
 ## Related
 
-- Upstream discussion: [OpenCADStudio#100](https://github.com/HakanSeven12/OpenCADStudio/issues/100)
+- Extensibility epic: [OpenCADStudio#100](https://github.com/HakanSeven12/OpenCADStudio/issues/100)
 - Reference plugin: [opencad-example-plugin](https://github.com/HakanSeven12/opencad-example-plugin)
-- Source fork: [mf4633/OpenCADStudio `feature/storm-sewer-module`](https://github.com/mf4633/OpenCADStudio/tree/feature/storm-sewer-module)
+- Source fork history: [mf4633/OpenCADStudio `feature/storm-sewer-module`](https://github.com/mf4633/OpenCADStudio/tree/feature/storm-sewer-module)
 
 ## License
 
-GPL-3.0-only — see engine crate headers.
+GPL-3.0-only
