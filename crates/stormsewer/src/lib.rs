@@ -12,7 +12,7 @@
 //! * normal-depth, critical-depth and full-flow capacity,
 //! * **HGL backwater** with junction losses and **standard-pipe sizing**
 //!   against velocity / capacity criteria (Hydraflow-style design checks).
-//! * *(forthcoming)* full **HEC-22** inlet capacity and multi-return-period IDF sets.
+//! * **HEC-22** inlet capacity (grate, curb opening, combination, sag) and multi-RP IDF sets.
 //!
 //! This is an **engine only**: no GUI and no CAD dependencies, so it compiles
 //! to a native library, to WASM (for hydrocomplete.com), and is consumable as
@@ -43,6 +43,7 @@ pub mod network;
 pub mod params;
 pub mod parse;
 pub mod report;
+pub mod report_html;
 
 pub use catchment::*;
 pub use design::*;
@@ -54,3 +55,4 @@ pub use io::*;
 pub use network::*;
 pub use params::*;
 pub use parse::*;
+pub use report_html::*;

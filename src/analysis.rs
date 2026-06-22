@@ -8,7 +8,8 @@
 use acadrust::types::Vector3;
 use acadrust::{Circle, EntityType, Line, MText};
 
-use stormsewer::design::{check_inlet, design_review, DesignFinding, ReviewCriteria};
+use stormsewer::design::{check_inlet_geom, design_review, DesignFinding, ReviewCriteria};
+use stormsewer::report_html::{format_analysis_html, HtmlReportMeta};
 use stormsewer::drawing::{draw_network, DrawConfig};
 use stormsewer::idf::IdfCurve;
 use stormsewer::network::{Analysis, AnalysisOptions, Network, Node, NodeKind, Pipe};
@@ -67,6 +68,37 @@ pub fn report_doc<'a>(
     Ok(full_report(&net, &a, params))
 }
 
+/// Reconstruct from drawn entities and return a KaTeX HTML report.
+pub fn report_html_doc<'a>(
+    entities: impl Iterator<Item = &'a EntityType>,
+    params: &StormAnalysisParams,
+    drawing_name: &str,
+) -> Result<String, String> {
+    let net = data::network_from_entities(entities)?;
+    let a = run_analysis(&net, params.idf.design_curve(), &params.hydraulics)?;
+    let stamp = chrono_like_stamp();
+    Ok(format_analysis_html(
+        &net,
+        &a,
+        params,
+        &HtmlReportMeta {
+            title: "Storm Sewer Analysis Report".into(),
+            drawing_name: drawing_name.into(),
+            generated_utc: stamp,
+        },
+    ))
+}
+
+fn chrono_like_stamp() -> String {
+    // Avoid chrono dependency — coarse UTC stamp from system time.
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    format!("unix-{secs}")
+}
+
 /// Reconstruct from drawn entities, analyze, and run the design-criteria review
 /// (velocity / cover / slope / capacity / size-progression / surface flooding).
 pub fn design_review_doc<'a>(
@@ -110,16 +142,14 @@ fn inlet_section(net: &Network, a: &Analysis, params: &StormAnalysisParams) -> S
             continue;
         }
         if !any {
-            s.push_str("\n=== INLET CAPACITY (HEC-22 grate, simplified) ===\n");
+            s.push_str(&format!(
+                "\n=== INLET CAPACITY (HEC-22 {}) ===\n",
+                params.inlet_kind.label()
+            ));
             s.push_str("Node   Q(cfs)  Cap(cfs)  Status\n");
             any = true;
         }
-        let chk = check_inlet(
-            q,
-            params.inlet_grate_length_ft,
-            params.inlet_flow_depth_ft,
-            params.inlet_gutter_slope,
-        );
+        let chk = check_inlet_geom(q, &params.inlet_geometry());
         let status = if chk.ok { "ok" } else { "BYPASS" };
         s.push_str(&format!(
             "{:<6} {:>6.2} {:>8.2}  {status}\n",

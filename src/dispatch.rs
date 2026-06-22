@@ -121,6 +121,24 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             }
             true
         }
+        "SS_REPORT_HTML" => {
+            let params = tab_params(host);
+            let drawing = format!("tab-{}", host.tab_index());
+            match analysis::report_html_doc(entities(host), &params, &drawing) {
+                Ok(html) => match super::html_report::write_report(&html, &drawing) {
+                    Ok(path) => {
+                        super::html_report::open_in_browser(&path);
+                        host.push_info(&format!(
+                            "HTML report written: {}",
+                            path.display()
+                        ));
+                    }
+                    Err(e) => host.push_error(&e),
+                },
+                Err(e) => host.push_error(&e),
+            }
+            true
+        }
         "SS_MULTIRP" => {
             let params = tab_params(host);
             match analysis::multi_rp_report(entities(host), &params) {

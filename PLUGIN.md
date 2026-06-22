@@ -14,7 +14,7 @@ External add-on for gravity storm-drain network design and analysis in [Open CAD
 | `SS_EDIT <handle> <field> <value> [...]` | 0.2 | Edit structure or pipe XDATA |
 | `SS_VALIDATE` | 0.2 | Integrity + design-criteria review (see below) |
 | `SS_ANALYZE` | 0.1 | Run analysis (+ surcharge/flood styling) |
-| `SS_REPORT` / `SS_PROFILE` / `SS_SIZE` | 0.1 | Report, profile, sizing |
+| `SS_REPORT` / `SS_REPORT_HTML` / `SS_PROFILE` / `SS_SIZE` | 0.1 / 0.3 | Text report; KaTeX HTML to `Documents\StormSewer\`; profile; sizing |
 | `SS_PARAMS` / `SS_MULTIRP` / `SS_APPLYTC` | 0.1 | Parameters, multi-RP, Tc apply |
 | `SS_IMPORTXML <path>` | 0.1 | LandXML import (ribbon file dialog too) |
 | `SS_CATCHMENT` | — | Manual XDATA / LandXML (interactive polyline pick planned) |

@@ -1,5 +1,6 @@
 // Parse `SS_PARAMS` subcommands and update StormTabState.
 
+use stormsewer::design::InletKind;
 use stormsewer::idf::IdfCurve;
 use stormsewer::params::StormAnalysisParams;
 
@@ -91,6 +92,21 @@ pub fn apply_params(state: &mut StormTabState, rest: &str) -> Result<String, Str
             state.params.sizing.max_pct_full = (v / 100.0).clamp(0.1, 1.0);
             Ok(format!("Max % full set to {v:.0}%."))
         }
+        "INLETKIND" | "INLETTYPE" | "INLET" => {
+            let kind = t
+                .get(1)
+                .ok_or("SS_PARAMS INLETKIND grate|curb|combo|sag")?
+                .trim();
+            let parsed = InletKind::from_str_loose(kind)
+                .ok_or("INLETKIND: use grate, curb, combo, or sag")?;
+            state.params.inlet_kind = parsed;
+            Ok(format!("Inlet type set to {}.", parsed.label()))
+        }
+        "CURBLEN" | "CURBOPEN" => {
+            let v = parse_f64(t.get(1).ok_or("SS_PARAMS CURBLEN <ft>")?)?;
+            state.params.inlet_curb_length_ft = v;
+            Ok(format!("Curb opening length set to {v:.2} ft."))
+        }
         "INLETLEN" | "GRATE" => {
             let v = parse_f64(t.get(1).ok_or("SS_PARAMS INLETLEN <ft>")?)?;
             state.params.inlet_grate_length_ft = v;
@@ -111,7 +127,7 @@ pub fn apply_params(state: &mut StormTabState, rest: &str) -> Result<String, Str
             Ok("Storm params reset to municipal defaults.".into())
         }
         _ => Err(format!(
-            "Unknown SS_PARAMS key `{key}`. Keys: RP, IDF, TAILWATER, MINTC, JUNCTIONK, VMIN, VMAX, MAXFULL, INLETLEN, INLETD, INLETS, RESET"
+            "Unknown SS_PARAMS key `{key}`. Keys: RP, IDF, TAILWATER, MINTC, JUNCTIONK, VMIN, VMAX, MAXFULL, INLETKIND, INLETLEN, CURBLEN, INLETD, INLETS, RESET"
         )),
     }
 }
@@ -125,6 +141,13 @@ mod tests {
         let mut s = StormTabState::default();
         apply_params(&mut s, "RP 25").unwrap();
         assert_eq!(s.params.idf.design_rp, 25);
+    }
+
+    #[test]
+    fn sets_inlet_kind() {
+        let mut s = StormTabState::default();
+        apply_params(&mut s, "INLETKIND combo").unwrap();
+        assert_eq!(s.params.inlet_kind, InletKind::Combination);
     }
 
     #[test]

@@ -7,6 +7,7 @@ mod analysis;
 mod data;
 mod dispatch;
 mod edit;
+mod html_report;
 mod interactive;
 #[cfg(test)]
 mod integration_tests;
@@ -30,7 +31,7 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.2.2",
+        version: "0.2.3",
         description: "Gravity storm-drain network design and analysis",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,
@@ -93,6 +94,7 @@ impl CadModule for StormSewerModule {
                     RibbonItem::Tool(tool("SS_PARAMS", "Params", "⚙")),
                     RibbonItem::Tool(tool("SS_MULTIRP", "Multi-RP", "≋")),
                     RibbonItem::Tool(tool("SS_REPORT", "Report", "📋")),
+                    RibbonItem::Tool(tool("SS_REPORT_HTML", "HTML\nReport", "📄")),
                     RibbonItem::Tool(tool("SS_PROFILE", "Profile", "▤")),
                 ],
             },
