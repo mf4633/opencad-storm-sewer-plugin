@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ocs_plugin_api::host::{ensure_plugin_state, HostApi};
+use ocs_plugin_api::host::HostApi;
 
 use acadrust::EntityType;
 use acadrust::Handle;
@@ -9,22 +9,18 @@ use stormsewer::network::NodeKind;
 
 use super::analysis;
 use super::edit;
+use super::interactive::{PlacePipeInteractive, PlaceStructureInteractive};
 use super::landxml_import;
 use super::license;
 use super::license_cmd;
-use super::manifest::PLUGIN_ID;
 use super::params_cmd;
-use super::interactive::{PlacePipeInteractive, PlaceStructureInteractive};
 use super::placement;
 use super::sizing;
-use super::state::StormTabState;
 use super::validation;
 use super::{data, style};
 
 fn tab_params(host: &mut dyn HostApi) -> stormsewer::params::StormAnalysisParams {
-    ensure_plugin_state(host, PLUGIN_ID, StormTabState::default)
-        .params()
-        .clone()
+    super::state::tab_params(host)
 }
 
 fn entities<'a>(host: &'a dyn HostApi) -> impl Iterator<Item = &'a EntityType> {
@@ -152,10 +148,7 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
                 Ok(html) => match super::html_report::write_report(&html, &drawing) {
                     Ok(path) => {
                         super::html_report::open_in_browser(&path);
-                        host.push_info(&format!(
-                            "HTML report written: {}",
-                            path.display()
-                        ));
+                        host.push_info(&format!("HTML report written: {}", path.display()));
                     }
                     Err(e) => host.push_error(&e),
                 },
@@ -241,8 +234,10 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
         }
         cmd if cmd == "SS_PARAMS" || cmd.starts_with("SS_PARAMS ") => {
             let rest = cmd.trim_start_matches("SS_PARAMS").trim();
-            let state = ensure_plugin_state(host, PLUGIN_ID, StormTabState::default);
-            match params_cmd::apply_params(state, rest) {
+            let applied = super::state::with_tab_state_mut(host, |state| {
+                params_cmd::apply_params(state, rest)
+            });
+            match applied {
                 Ok(msg) => host.push_info(&msg),
                 Err(e) => host.push_error(&e),
             }
@@ -273,7 +268,8 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         cmd if cmd.starts_with("SS_INLET ") => {
-            match placement::place_structure(host, NodeKind::Inlet, command_arg(cmd).unwrap_or("")) {
+            match placement::place_structure(host, NodeKind::Inlet, command_arg(cmd).unwrap_or(""))
+            {
                 Ok(msg) => host.push_info(&msg),
                 Err(e) => host.push_error(&e),
             }
@@ -284,7 +280,11 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         cmd if cmd.starts_with("SS_JUNCTION ") => {
-            match placement::place_structure(host, NodeKind::Junction, command_arg(cmd).unwrap_or("")) {
+            match placement::place_structure(
+                host,
+                NodeKind::Junction,
+                command_arg(cmd).unwrap_or(""),
+            ) {
                 Ok(msg) => host.push_info(&msg),
                 Err(e) => host.push_error(&e),
             }
@@ -295,7 +295,11 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
             true
         }
         cmd if cmd.starts_with("SS_OUTFALL ") => {
-            match placement::place_structure(host, NodeKind::Outfall, command_arg(cmd).unwrap_or("")) {
+            match placement::place_structure(
+                host,
+                NodeKind::Outfall,
+                command_arg(cmd).unwrap_or(""),
+            ) {
                 Ok(msg) => host.push_info(&msg),
                 Err(e) => host.push_error(&e),
             }

@@ -9,8 +9,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
-pub const DEFAULT_VALIDATE_URL: &str =
-    "https://hc-refactored.fly.dev/api/licensing/validate";
+pub const DEFAULT_VALIDATE_URL: &str = "https://hc-refactored.fly.dev/api/licensing/validate";
 
 pub const TOKEN_PREFIX: &str = "hc_live_";
 
@@ -143,7 +142,12 @@ impl LicenseActivator {
         self
     }
 
-    pub fn activate(&self, email: &str, token: &str, license_path: &Path) -> LicenseActivationResult {
+    pub fn activate(
+        &self,
+        email: &str,
+        token: &str,
+        license_path: &Path,
+    ) -> LicenseActivationResult {
         let email = email.trim();
         let token = token.trim();
         if email.is_empty() || !email.contains('@') {
@@ -171,7 +175,12 @@ impl LicenseActivator {
         self.activate_core(&existing.email, &existing.token, license_path)
     }
 
-    fn activate_core(&self, email: &str, token: &str, license_path: &Path) -> LicenseActivationResult {
+    fn activate_core(
+        &self,
+        email: &str,
+        token: &str,
+        license_path: &Path,
+    ) -> LicenseActivationResult {
         let online = self.try_online_validation(email, token);
         if online.success {
             if let Some(record) = online.record {
@@ -191,18 +200,16 @@ impl LicenseActivator {
             return fail(format!("{detail} {}", wrong_product_hint()));
         }
         if !is_well_formed_token(token) {
-            return fail(
-                online
-                    .error_message
-                    .unwrap_or_else(|| "Online validation failed and token format is invalid.".into()),
-            );
+            return fail(online.error_message.unwrap_or_else(|| {
+                "Online validation failed and token format is invalid.".into()
+            }));
         }
 
         #[cfg(not(debug_assertions))]
         {
-            let detail = online.error_message.unwrap_or_else(|| {
-                "Could not reach the license server.".into()
-            });
+            let detail = online
+                .error_message
+                .unwrap_or_else(|| "Could not reach the license server.".into());
             return fail(format!(
                 "{detail} Purchase a Storm Sewer Pro key at {PURCHASE_URL} and try again."
             ));
@@ -416,7 +423,11 @@ fn format_iso8601(secs: u64) -> String {
 
 fn ymd_from_unix_days(mut z: i64) -> (i64, i64, i64) {
     z += 719468;
-    let era = if z >= 0 { z / 146097 } else { (z - 146096) / 146097 };
+    let era = if z >= 0 {
+        z / 146097
+    } else {
+        (z - 146096) / 146097
+    };
     let doe = z - era * 146097;
     let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
     let y = yoe + era * 400;
@@ -436,7 +447,9 @@ fn read_expires(root: &serde_json::Value) -> Option<String> {
 }
 
 fn read_error_message(root: &serde_json::Value) -> Option<String> {
-    root.get("error").and_then(|e| e.as_str()).map(str::to_string)
+    root.get("error")
+        .and_then(|e| e.as_str())
+        .map(str::to_string)
 }
 
 fn fail(message: impl Into<String>) -> LicenseActivationResult {
@@ -467,10 +480,7 @@ pub fn status_label() -> String {
                 license.email
             );
         }
-        return format!(
-            "Pro ({PRODUCT_LABEL}, licensed to {})",
-            license.email
-        );
+        return format!("Pro ({PRODUCT_LABEL}, licensed to {})", license.email);
     }
     if let Some(stored) = try_read_license_metadata(&path) {
         if !stored.product.is_empty() && stored.product != PRODUCT_ID {
@@ -480,7 +490,10 @@ pub fn status_label() -> String {
             );
         }
         if let Some(expires) = format_expiry_date(&stored.expires) {
-            return format!("Expired ({PRODUCT_LABEL}, was {}, expired {expires})", stored.email);
+            return format!(
+                "Expired ({PRODUCT_LABEL}, was {}, expired {expires})",
+                stored.email
+            );
         }
     }
     "Free".into()

@@ -2,9 +2,9 @@
 
 Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeven12/OpenCADStudio), distributed as a prebuilt dynamic library via GitHub Releases.
 
-Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v2**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
+Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v5**, built for OCS **v2026.36**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.3.0)
+## Status (v0.3.1)
 
 | Area | Status |
 |------|--------|
@@ -43,9 +43,9 @@ opencad-storm-sewer-plugin/
 
 ## Install (from Open CAD Studio)
 
-**Plugin Manager → Add repository →** `mf4633/opencad-storm-sewer-plugin`, pick a **v0.2.1+** release (API v2), **Install**, restart OCS.
+**Plugin Manager → marketplace → Storm Sewer → Install**, restart OCS.
 
-Requires Open CAD Studio **v0.6.0+** (interactive-command hook).
+Requires Open CAD Studio **v2026.36** (plugin API 5). The host refuses a plugin whose rustc/acadrust fingerprint differs from its own, so each plugin release is built for one OCS release; older releases (v0.2.x, API 2) load on the current host but fail on the first command.
 
 ## Build
 

@@ -8,9 +8,9 @@ mod data;
 mod dispatch;
 mod edit;
 mod html_report;
-mod interactive;
 #[cfg(test)]
 mod integration_tests;
+mod interactive;
 mod landxml_import;
 pub mod license;
 mod license_cmd;
@@ -33,7 +33,7 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.3.0",
+        version: "0.3.1",
         description: "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,
@@ -63,52 +63,57 @@ impl CadModule for StormSewerModule {
         "Storm Sewer"
     }
 
-    fn ribbon_groups(&self) -> Vec<RibbonGroup> {
-        vec![
-            RibbonGroup {
-                title: "Network",
-                tools: vec![
-                    RibbonItem::LargeTool(tool("SS_INLET", "Inlet", "◉")),
-                    RibbonItem::LargeTool(tool("SS_JUNCTION", "Junction", "◎")),
-                    RibbonItem::LargeTool(tool("SS_OUTFALL", "Outfall", "▽")),
-                    RibbonItem::LargeTool(tool("SS_PIPE", "Pipe\nRun", "╱")),
-                    RibbonItem::Tool(ToolDef {
-                        id: "SS_IMPORTXML",
-                        label: "Import\nLandXML",
-                        icon: IconKind::Glyph("⬇"),
-                        event: ModuleEvent::PluginFileDialog {
-                            command: "SS_IMPORTXML".to_string(),
-                            title: "Import LandXML pipe network".to_string(),
-                            filter_name: "LandXML".to_string(),
-                            extensions: vec!["xml".to_string(), "landxml".to_string()],
-                        },
-                    }),
-                    RibbonItem::Tool(tool("SS_APPLYTC", "Apply Tc", "⏱")),
-                    RibbonItem::Tool(tool("SS_EDIT", "Edit", "✎")),
-                ],
-            },
-            RibbonGroup {
-                title: "Analysis",
-                tools: vec![
-                    RibbonItem::LargeTool(tool("SS_ANALYZE", "Analyze", "⚡")),
-                    RibbonItem::LargeTool(tool("SS_SIZE", "Size\nPipes", "⌀")),
-                    RibbonItem::Tool(tool("SS_VALIDATE", "Validate", "✓")),
-                    RibbonItem::Tool(tool("SS_PARAMS", "Params", "⚙")),
-                    RibbonItem::Tool(tool("SS_MULTIRP", "Multi-RP", "≋")),
-                    RibbonItem::Tool(tool("SS_REPORT", "Report", "📋")),
-                    RibbonItem::Tool(tool("SS_REPORT_HTML", "HTML\nReport", "📄")),
-                    RibbonItem::Tool(tool("SS_PROFILE", "Profile", "▤")),
-                ],
-            },
-            RibbonGroup {
-                title: "Pro",
-                tools: vec![
-                    RibbonItem::Tool(tool("SS_LICENSE", "License", "🔑")),
-                    RibbonItem::Tool(tool("SS_ACTIVATE", "Activate", "✔")),
-                ],
-            },
-        ]
+    fn ribbon_groups(&self) -> &[RibbonGroup] {
+        static GROUPS: std::sync::OnceLock<Vec<RibbonGroup>> = std::sync::OnceLock::new();
+        GROUPS.get_or_init(build_ribbon_groups)
     }
+}
+
+fn build_ribbon_groups() -> Vec<RibbonGroup> {
+    vec![
+        RibbonGroup {
+            title: "Network",
+            tools: vec![
+                RibbonItem::LargeTool(tool("SS_INLET", "Inlet", "◉")),
+                RibbonItem::LargeTool(tool("SS_JUNCTION", "Junction", "◎")),
+                RibbonItem::LargeTool(tool("SS_OUTFALL", "Outfall", "▽")),
+                RibbonItem::LargeTool(tool("SS_PIPE", "Pipe\nRun", "╱")),
+                RibbonItem::Tool(ToolDef {
+                    id: "SS_IMPORTXML",
+                    label: "Import\nLandXML",
+                    icon: IconKind::Glyph("⬇"),
+                    event: ModuleEvent::PluginFileDialog {
+                        command: "SS_IMPORTXML".to_string(),
+                        title: "Import LandXML pipe network".to_string(),
+                        filter_name: "LandXML".to_string(),
+                        extensions: vec!["xml".to_string(), "landxml".to_string()],
+                    },
+                }),
+                RibbonItem::Tool(tool("SS_APPLYTC", "Apply Tc", "⏱")),
+                RibbonItem::Tool(tool("SS_EDIT", "Edit", "✎")),
+            ],
+        },
+        RibbonGroup {
+            title: "Analysis",
+            tools: vec![
+                RibbonItem::LargeTool(tool("SS_ANALYZE", "Analyze", "⚡")),
+                RibbonItem::LargeTool(tool("SS_SIZE", "Size\nPipes", "⌀")),
+                RibbonItem::Tool(tool("SS_VALIDATE", "Validate", "✓")),
+                RibbonItem::Tool(tool("SS_PARAMS", "Params", "⚙")),
+                RibbonItem::Tool(tool("SS_MULTIRP", "Multi-RP", "≋")),
+                RibbonItem::Tool(tool("SS_REPORT", "Report", "📋")),
+                RibbonItem::Tool(tool("SS_REPORT_HTML", "HTML\nReport", "📄")),
+                RibbonItem::Tool(tool("SS_PROFILE", "Profile", "▤")),
+            ],
+        },
+        RibbonGroup {
+            title: "Pro",
+            tools: vec![
+                RibbonItem::Tool(tool("SS_LICENSE", "License", "🔑")),
+                RibbonItem::Tool(tool("SS_ACTIVATE", "Activate", "✔")),
+            ],
+        },
+    ]
 }
 
 struct StormSewerPlugin;

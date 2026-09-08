@@ -22,7 +22,10 @@ pub fn pro_required_lines(cmd: &str) -> Vec<String> {
     };
     vec![
         format!("--- Storm Sewer: {cmd} is a Pro feature ($29/year) ---"),
-        format!("  Buy a key at {}  then run  SS_ACTIVATE <email> <hc_live_ss_...>", license::PURCHASE_URL),
+        format!(
+            "  Buy a key at {}  then run  SS_ACTIVATE <email> <hc_live_ss_...>",
+            license::PURCHASE_URL
+        ),
         free_alt.to_string(),
     ]
 }
@@ -52,10 +55,16 @@ pub fn activate_lines(args: &str) -> Vec<String> {
     let trimmed = args.trim();
     if trimmed.is_empty() {
         return vec![
-            format!("=== Storm Sewer Pro Activation ({}) ===", license::PRODUCT_LABEL),
+            format!(
+                "=== Storm Sewer Pro Activation ({}) ===",
+                license::PRODUCT_LABEL
+            ),
             "  Usage: SS_ACTIVATE <email> <hc_live_token>".into(),
             "  Or paste both on one line: email@domain.com hc_live_ss_...".into(),
-            format!("  Buy a Storm Sewer Pro key ($29/year) at {}", license::PURCHASE_URL),
+            format!(
+                "  Buy a Storm Sewer Pro key ($29/year) at {}",
+                license::PURCHASE_URL
+            ),
         ];
     }
     let (email, token) = if let Some((e, t)) = license::try_parse_combined_input(trimmed) {
@@ -100,7 +109,14 @@ mod tests {
         assert!(is_pro_command("SS_REPORT_HTML"));
         assert!(is_pro_command("SS_SIZE"));
         assert!(is_pro_command("SS_MULTIRP"));
-        for free in ["SS_ANALYZE", "SS_REPORT", "SS_PROFILE", "SS_VALIDATE", "SS_PIPE", "SS_IMPORTXML"] {
+        for free in [
+            "SS_ANALYZE",
+            "SS_REPORT",
+            "SS_PROFILE",
+            "SS_VALIDATE",
+            "SS_PIPE",
+            "SS_IMPORTXML",
+        ] {
             assert!(!is_pro_command(free), "{free} must stay free");
         }
     }
