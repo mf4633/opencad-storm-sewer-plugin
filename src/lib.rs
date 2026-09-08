@@ -12,6 +12,8 @@ mod interactive;
 #[cfg(test)]
 mod integration_tests;
 mod landxml_import;
+pub mod license;
+mod license_cmd;
 mod params_cmd;
 mod placement;
 mod sizing;
@@ -31,8 +33,8 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.2.3",
-        description: "Gravity storm-drain network design and analysis",
+        version: "0.3.0",
+        description: "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,
         xdata_apps: &["STORMSEWER_STRUCT", "STORMSEWER_PIPE", "STORMSEWER_CATCHMENT"],
@@ -96,6 +98,13 @@ impl CadModule for StormSewerModule {
                     RibbonItem::Tool(tool("SS_REPORT", "Report", "📋")),
                     RibbonItem::Tool(tool("SS_REPORT_HTML", "HTML\nReport", "📄")),
                     RibbonItem::Tool(tool("SS_PROFILE", "Profile", "▤")),
+                ],
+            },
+            RibbonGroup {
+                title: "Pro",
+                tools: vec![
+                    RibbonItem::Tool(tool("SS_LICENSE", "License", "🔑")),
+                    RibbonItem::Tool(tool("SS_ACTIVATE", "Activate", "✔")),
                 ],
             },
         ]

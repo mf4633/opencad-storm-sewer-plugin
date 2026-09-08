@@ -4,7 +4,7 @@ resolver = "2"
 
 [package]
 name = "opencad-storm-sewer-plugin"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2021"
 description = "Storm Sewer hydraulics add-on for Open CAD Studio — external cdylib plugin."
 license = "GPL-3.0-only"
@@ -17,6 +17,10 @@ crate-type = ["cdylib"]
 ocs_plugin_api = { git = "https://github.com/HakanSeven12/OpenCADStudio", rev = "495455180865785ae8cc1875e61ef9bc03494cc5", features = ["host"] }
 acadrust = "0.3.4"
 stormsewer = { path = "crates/stormsewer" }
+# Pro license activation (SS_ACTIVATE): JSON license file + online key validation.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2", features = ["json"] }
 
 [patch.crates-io]
 # Match the host's acadrust fork for binary compatibility (see plugin-architecture.md).

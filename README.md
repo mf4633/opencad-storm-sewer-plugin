@@ -4,12 +4,13 @@ Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeve
 
 Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v2**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.2.3)
+## Status (v0.3.0)
 
 | Area | Status |
 |------|--------|
 | Engine (`stormsewer`) | Rational, Manning, HGL, LandXML, `.ssn` |
-| Analysis | `SS_ANALYZE` (+ surcharge/flood colors), report, **HTML/KaTeX report**, profile, sizing, multi-RP |
+| Analysis | `SS_ANALYZE` (+ surcharge/flood colors), report, profile — free |
+| Pro ($29/yr) | **HTML/KaTeX report** (`SS_REPORT_HTML`), pipe sizing (`SS_SIZE`), multi-RP (`SS_MULTIRP`) — `SS_ACTIVATE` with a key from [hydrocomplete.com/stormsewer](https://hydrocomplete.com/stormsewer) |
 | Interactive placement | `SS_INLET` / `SS_JUNCTION` / `SS_OUTFALL` (click) + `SS_PIPE` (two structure picks) via `InteractiveCommand` |
 | Automation placement | `SS_INLET 100,200 …`, `SS_PIPE 1 2`, coordinate/handle forms for `--serve` |
 | Edit / validate | `SS_EDIT`; `SS_VALIDATE` integrity + design-criteria review (velocity, cover, slope, capacity, size progression, flooding) |
@@ -33,6 +34,8 @@ opencad-storm-sewer-plugin/
 │   ├── placement.rs        # coordinate/handle placement for automation
 │   ├── data.rs             # XDATA schemas + network reconstruction
 │   ├── analysis.rs         # engine bridge
+│   ├── license.rs          # Pro key activation + cached license file
+│   ├── license_cmd.rs      # SS_LICENSE / SS_ACTIVATE text + Pro gate list
 │   └── …
 ├── examples/automate_analyze.py
 └── .github/workflows/release.yml

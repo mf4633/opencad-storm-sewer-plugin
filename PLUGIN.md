@@ -14,10 +14,28 @@ External add-on for gravity storm-drain network design and analysis in [Open CAD
 | `SS_EDIT <handle> <field> <value> [...]` | 0.2 | Edit structure or pipe XDATA |
 | `SS_VALIDATE` | 0.2 | Integrity + design-criteria review (see below) |
 | `SS_ANALYZE` | 0.1 | Run analysis (+ surcharge/flood styling) |
-| `SS_REPORT` / `SS_REPORT_HTML` / `SS_PROFILE` / `SS_SIZE` | 0.1 / 0.3 | Text report; KaTeX HTML to `Documents\StormSewer\`; profile; sizing |
-| `SS_PARAMS` / `SS_MULTIRP` / `SS_APPLYTC` | 0.1 | Parameters, multi-RP, Tc apply |
+| `SS_REPORT` / `SS_PROFILE` | 0.1 | Text report to the command line; HGL profile on the drawing |
+| `SS_REPORT_HTML` **(Pro)** | 0.2.3 | KaTeX HTML report to `Documents\StormSewer\` |
+| `SS_SIZE` **(Pro)** | 0.1 | Auto-size pipes to capacity/velocity criteria |
+| `SS_MULTIRP` **(Pro)** | 0.1 | Multi-return-period table |
+| `SS_PARAMS` / `SS_APPLYTC` | 0.1 | Parameters, Tc apply |
+| `SS_LICENSE` | 0.3 | Show license status, file path and what Pro unlocks |
+| `SS_ACTIVATE <email> <hc_live_ss_…>` | 0.3 | Activate a Pro key (online validation against hydrocomplete.com) |
 | `SS_IMPORTXML <path>` | 0.1 | LandXML import (ribbon file dialog too) |
 | `SS_CATCHMENT` | — | Manual XDATA / LandXML (interactive polyline pick planned) |
+
+## Free vs Pro
+
+Drawing, LandXML import, `SS_ANALYZE`, `SS_REPORT`, `SS_PROFILE` and `SS_VALIDATE` are free. **Pro ($29/year, one seat)** unlocks the deliverables: `SS_REPORT_HTML`, `SS_SIZE` and `SS_MULTIRP`. Buy a key at <https://hydrocomplete.com/stormsewer>, then:
+
+```
+SS_ACTIVATE you@firm.com hc_live_ss_…
+SS_LICENSE
+```
+
+The key is validated online (`POST /api/licensing/validate`, product `stormsewer`) and cached in `%APPDATA%\HydroComplete\stormsewer-license.json` (`$HOME/HydroComplete/` elsewhere) with its expiry, so later sessions do not need the network. Keys for the HydroComplete Open CAD Studio plugin (`opencad`) or Civil 3D (`civil3d`) are separate SKUs and will not activate this plugin. Running a Pro command without a key prints the purchase URL and the free alternative instead of failing silently.
+
+Debug builds honour `STORMSEWER_PRO=1` as a developer bypass; release builds ignore it.
 
 ### Example workflow (v0.2, no interactive pick)
 

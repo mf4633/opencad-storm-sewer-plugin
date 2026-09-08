@@ -10,6 +10,8 @@ use stormsewer::network::NodeKind;
 use super::analysis;
 use super::edit;
 use super::landxml_import;
+use super::license;
+use super::license_cmd;
 use super::manifest::PLUGIN_ID;
 use super::params_cmd;
 use super::interactive::{PlacePipeInteractive, PlaceStructureInteractive};
@@ -55,7 +57,29 @@ pub fn handle(host: &mut dyn HostApi, cmd: &str) -> bool {
         return false;
     }
 
+    // Pro gate: deliverable commands need an active license; everything else is free.
+    let base_cmd = cmd.split_whitespace().next().unwrap_or(cmd);
+    if license_cmd::is_pro_command(base_cmd) && !license::is_pro_enabled() {
+        for line in license_cmd::pro_required_lines(base_cmd) {
+            host.push_output(&line);
+        }
+        return true;
+    }
+
     match cmd {
+        "SS_LICENSE" => {
+            for line in license_cmd::license_lines() {
+                host.push_output(&line);
+            }
+            true
+        }
+        cmd if cmd == "SS_ACTIVATE" || cmd.starts_with("SS_ACTIVATE ") => {
+            let args = command_arg(cmd).unwrap_or("");
+            for line in license_cmd::activate_lines(args) {
+                host.push_output(&line);
+            }
+            true
+        }
         "SS_VALIDATE" => {
             // Integrity checks (XDATA well-formed, handles resolve) ...
             let mut report = validation::validate_entities(entities(host));
