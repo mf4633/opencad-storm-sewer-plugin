@@ -35,6 +35,8 @@ SS_LICENSE
 
 The key is validated online (`POST /api/licensing/validate`, product `stormsewer`) and cached in `%APPDATA%\HydroComplete\stormsewer-license.json` (`$HOME/HydroComplete/` elsewhere) with its expiry, so later sessions do not need the network. Keys for the HydroComplete Open CAD Studio plugin (`opencad`) or Civil 3D (`civil3d`) are separate SKUs and will not activate this plugin. Running a Pro command without a key prints the purchase URL and the free alternative instead of failing silently.
 
+Every 7 days the plugin silently re-checks the key with the server the next time a Pro command runs (4 s timeout). A rejected key (revoked, expired, refunded) deletes the cached license immediately; if the server is unreachable the cached license keeps working for 30 days after its last successful check, then `SS_LICENSE` reports it and `SS_ACTIVATE` is required again. Network attempts are throttled to one per day while offline.
+
 Debug builds honour `STORMSEWER_PRO=1` as a developer bypass; release builds ignore it.
 
 ### Example workflow (v0.2, no interactive pick)

@@ -1,7 +1,7 @@
 [plugin]
 id = "opencad.storm_sewer"
 name = "Storm Sewer"
-version = "0.3.1"
+version = "0.3.2"
 description = "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)"
 author = "Michael Flynn"
 license = "GPL-3.0-only"

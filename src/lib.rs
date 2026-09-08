@@ -33,7 +33,7 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.3.1",
+        version: "0.3.2",
         description: "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,

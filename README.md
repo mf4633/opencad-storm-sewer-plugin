@@ -4,7 +4,7 @@ Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeve
 
 Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v5**, built for OCS **v2026.36**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
 
-## Status (v0.3.1)
+## Status (v0.3.2)
 
 | Area | Status |
 |------|--------|

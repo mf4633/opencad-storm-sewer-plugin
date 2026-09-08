@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.2 — 2026-09-08
+
+- **Periodic online re-validation.** A cached Pro license is re-checked with the
+  server every 7 days (silently, 4 s timeout, at most one attempt per day when
+  offline). Server rejection deletes the cached license; unreachable server =
+  30-day offline grace after the last good check, then re-activation.
+- 401/403 from the server is now classified as rejection, not a network error.
+- The license file stores the `hc_live_*` key itself (earlier builds stored the
+  server access token, which could not be re-validated); legacy files are
+  unwrapped transparently.
+- Verified on OCS v2026.36: stale rejected key → license removed, report
+  blocked; stale valid key → refreshed, report written.
+
 ## 0.3.1 — 2026-09-08
 
 - **Rebuilt for Open CAD Studio v2026.36 (plugin API 5).** v0.3.0 and every
