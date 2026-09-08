@@ -45,7 +45,7 @@ opencad-storm-sewer-plugin/
 
 **Plugin Manager → marketplace → Storm Sewer → Install**, restart OCS.
 
-Requires Open CAD Studio **v2026.36** (plugin API 5). The host refuses a plugin whose rustc/acadrust fingerprint differs from its own, so each plugin release is built for one OCS release; older releases (v0.2.x, API 2) load on the current host but fail on the first command.
+Requires Open CAD Studio **v2026.36** (plugin API 5). The host refuses a plugin whose rustc/acadrust fingerprint differs from its own, so each plugin release is built for one OCS release (`ocs-host.lock` records which; the `host-drift` workflow checks the latest OCS daily and opens an issue when a rebuild is needed); older releases (v0.2.x, API 2) load on the current host but fail on the first command.
 
 ## Build
 
