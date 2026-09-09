@@ -27,6 +27,10 @@ pub fn pro_required_lines(cmd: &str) -> Vec<String> {
             license::PURCHASE_URL
         ),
         free_alt.to_string(),
+        format!(
+            "  Or free: the standalone StormSewer desktop app does this at no cost — {}",
+            license::FREE_DESKTOP_URL
+        ),
     ]
 }
 
@@ -147,5 +151,33 @@ mod tests {
         let lines = license_lines();
         assert!(lines[1].contains("stormsewer"));
         assert!(lines.iter().any(|l| l.contains("stay free")));
+    }
+}
+
+#[cfg(test)]
+mod disclosure_tests {
+    use super::*;
+
+    /// The Pro gate must name the free desktop app that does the same job.
+    /// The plugin's three Pro features are all free in the standalone
+    /// StormSewer app; a buyer who finds that out only after paying has been
+    /// treated badly, so the gate says it up front.
+    #[test]
+    fn pro_gate_names_the_free_desktop_alternative() {
+        for cmd in PRO_COMMANDS {
+            let text = pro_required_lines(cmd).join("\n");
+            assert!(
+                text.contains(license::FREE_DESKTOP_URL),
+                "{cmd} gate does not point at the free desktop app: {text}"
+            );
+            assert!(
+                text.contains(license::PURCHASE_URL),
+                "{cmd} gate does not say where to buy: {text}"
+            );
+            assert!(
+                text.contains("Free alternative"),
+                "{cmd} gate does not name the free in-plugin command: {text}"
+            );
+        }
     }
 }

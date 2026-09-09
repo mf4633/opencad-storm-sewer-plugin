@@ -23,6 +23,12 @@ pub const PRODUCT_LABEL: &str = "Storm Sewer for Open CAD Studio";
 
 pub const PURCHASE_URL: &str = "https://hydrocomplete.com/stormsewer";
 
+/// The free standalone desktop application. Named in the Pro gate on purpose:
+/// it does everything this plugin's Pro tier does, at no cost. What Pro buys
+/// is staying inside the Open CAD Studio drawing, and a buyer is entitled to
+/// know that before paying rather than after.
+pub const FREE_DESKTOP_URL: &str = "https://github.com/mf4633/stormsewer";
+
 pub const LICENSE_FILE_NAME: &str = "stormsewer-license.json";
 
 pub const STUB_VALIDITY_DAYS: u64 = 365;
