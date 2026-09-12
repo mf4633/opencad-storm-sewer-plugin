@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.3 — 2026-09-12
+
+- **Edits now actually land in the drawing.** Open CAD Studio runs plugins out
+  of process, where edits made through the document snapshot were silently
+  discarded: SS_EDIT, SS_SIZE (Pro), Tc apply and analysis styling all reported
+  success and changed nothing. Changes are now committed to the host through
+  `update_entity`.
+- Verified on OCS v2026.36: `SS_EDIT <outfall> invert 102` now shows in
+  SS_REPORT_HTML as slope -0.0200 and HGL dn 102.00.
+
 ## 0.3.2 — 2026-09-08
 
 - **Periodic online re-validation.** A cached Pro license is re-checked with the
