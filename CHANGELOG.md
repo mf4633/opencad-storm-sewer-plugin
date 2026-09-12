@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4 — 2026-09-12
+
+- Open CAD Studio now shows the real plugin version. v0.3.3 carried the edit
+  fix but its compiled manifest still said "0.3.2" (hardcoded); the manifest now
+  reads Cargo.toml and a test keeps it equal to plugin.toml.
+
 ## 0.3.3 — 2026-09-12
 
 - **Edits now actually land in the drawing.** Open CAD Studio runs plugins out

@@ -33,7 +33,8 @@ pub mod manifest {
     pub static MANIFEST: PluginManifest = PluginManifest {
         id: PLUGIN_ID,
         name: "Storm Sewer",
-        version: "0.3.2",
+        // From Cargo.toml: a hardcoded string shipped v0.3.3 labelled "0.3.2".
+        version: env!("CARGO_PKG_VERSION"),
         description: "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)",
         api_version: ApiVersion::CURRENT,
         ribbon_order: 50,
@@ -131,3 +132,17 @@ impl BuiltinPlugin for StormSewerPlugin {
 }
 
 ocs_plugin_api::export_plugin!(StormSewerPlugin);
+
+#[cfg(test)]
+mod manifest_version_tests {
+    #[test]
+    fn manifest_version_matches_plugin_toml() {
+        let toml = include_str!("../plugin.toml");
+        let line = toml
+            .lines()
+            .find(|l| l.trim_start().starts_with("version"))
+            .expect("version line in plugin.toml");
+        let v = line.split('"').nth(1).expect("quoted version");
+        assert_eq!(crate::manifest::MANIFEST.version, v);
+    }
+}
