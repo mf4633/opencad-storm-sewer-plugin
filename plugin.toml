@@ -1,15 +1,18 @@
 [plugin]
 id = "opencad.storm_sewer"
 name = "Storm Sewer"
-version = "0.3.4"
+version = "0.3.5"
 description = "Gravity storm-drain network design and analysis (Pro: HTML reports, pipe sizing, multi-RP)"
 author = "Michael Flynn"
 license = "GPL-3.0-only"
 repository = "mf4633/opencad-storm-sewer-plugin"
 
 [opencad]
-api_version = 5
+api_version = 10
 rustc_version = "__RUSTC_VERSION__"
+# Required from API 4 (enforced since OCS v2026.42): the opencadcodec source
+# the plugin was built against, read from Cargo.lock at release time.
+acadrust_source = "__ACADRUST_SOURCE__"
 ribbon_order = 50
 command_prefixes = ["SS_"]
 xdata_apps = ["STORMSEWER_STRUCT", "STORMSEWER_PIPE", "STORMSEWER_CATCHMENT"]
