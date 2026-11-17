@@ -1,5 +1,7 @@
 # opencad-storm-sewer-plugin
 
+> **Unsupported (retired 2026-11-17).** This plugin was built for Open CAD Studio v2026.42 (plugin API 10). Open CAD Studio has since moved to plugin API 23 and replaced the drawing library the plugin depends on, so it does not load in current releases and will not be updated. The source stays available under GPL-3.0. The same analysis, reports and pipe sizing are free in the [StormSewer desktop app](https://github.com/mf4633/stormsewer).
+
 Storm Sewer hydraulics add-on for [Open CAD Studio](https://github.com/HakanSeven12/OpenCADStudio), distributed as a prebuilt dynamic library via GitHub Releases.
 
 Depends only on [`ocs_plugin_api`](https://github.com/HakanSeven12/OpenCADStudio/tree/main/crates/ocs_plugin_api) (API **v5**, built for OCS **v2026.36**) and the in-repo [`stormsewer`](crates/stormsewer) engine crate.
